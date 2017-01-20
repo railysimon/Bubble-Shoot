@@ -6,7 +6,15 @@ Window::Window(QWidget *parent): QDialog(parent), score(0), size(3)
     this->setWindowFlags(Qt::FramelessWindowHint);
     this->setWindowIcon(QIcon(QPixmap("icon.jpeg")));
     this->setWindowTitle("Bubble shoot");
+    target = new QCursor(QPixmap("arrow.png"));
     Settings();
+
+    QMediaPlayer *player = new QMediaPlayer;
+    QMediaPlaylist *list = new QMediaPlaylist(player);
+    player->setPlaylist(list);
+    list->addMedia(QUrl::fromLocalFile(QApplication::applicationDirPath() + "/vibra.wav"));
+    list->setPlaybackMode(QMediaPlaylist::CurrentItemInLoop);
+    player->play();
 }
 
 Window::~Window()
@@ -29,6 +37,7 @@ void Window::Settings() // creating scene, view, bg
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
+    view->setCursor(*target);
 
     QLinearGradient gradient(0, 0, width(), height());
     gradient.setColorAt(0, Qt::green);
@@ -65,9 +74,9 @@ void Window::BubsCreate() // creating the bubbles
     bubs = new bubble*[size];
     for(int i=0; i<size; i++)
     {
-        bubs[i] = new bubble(rand() % 300, (rand() % 100)*(-1), 30, 30);
+        bubs[i] = new bubble(rand() % 300, (rand() % 100)*(-1), 35, 35);
         scene->addItem(bubs[i]);
-        bubs[i]->setCursor(Qt::PointingHandCursor);
+        bubs[i]->setCursor(*target);
         connect(bubs[i], SIGNAL(signal()), this, SLOT(Game()));
     }
 }
@@ -75,7 +84,7 @@ void Window::BubsCreate() // creating the bubbles
 void Window::BubsDelete() // deleting the bubbles
 {
     for(int i=0; i<size; i++)
-        delete bubs[i];
+         scene->removeItem(bubs[i]);
     delete bubs;
 }
 
@@ -122,7 +131,7 @@ void Window::SlotPlay()
 void Window::Game() // click on the bubble
 {
     bubble *bub = qobject_cast<bubble*>(sender());
-    bub->setPos(50, (rand() % 100)*(-1)); // ?
+    bub->setPos(rand() % 200, (rand() % 100)*(-1)); // ?
 
     score++;
     scene->removeItem(text);
@@ -133,7 +142,7 @@ void Window::Move() // moving the bubbles
 {
     for(int i=0; i<size; i++)
     {
-        if(bubs[i]->y() >= height()) // if you lose
+        if(bubs[i]->y() >= height() + 10) // if you lose
         {
             system->stop();
             BubsDelete();

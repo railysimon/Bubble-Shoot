@@ -3,6 +3,7 @@
 
 #include "bubble.h"
 
+#include <QApplication>
 #include <QDialog>
 #include <QVBoxLayout>
 #include <QGraphicsScene>
@@ -12,6 +13,8 @@
 #include <QGraphicsTextItem>
 #include <QTimer>
 #include <QIcon>
+#include <QMediaPlayer>
+#include <QMediaPlaylist>
 
 #include <ctime>
 
@@ -32,6 +35,7 @@ private:
         QGraphicsView *view;
         QTimer *system; // system-timer
         bubble **bubs; // bubble array
+        QCursor *target;
 
         void Layout();
         void Settings();
